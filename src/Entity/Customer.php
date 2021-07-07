@@ -19,46 +19,46 @@ class Customer
 {
 	use IdentifierUnsigned;
 
-	/** @ORM\Column(type="string", length=128, unique=true) */
+	#[ORM\Column(type: 'string', length: 128, unique: true)]
 	private string $email;
 
-	/** @ORM\Column(type="string", length=32) */
+	#[ORM\Column(type: 'string', length: 32)]
 	private string $firstName;
 
-	/** @ORM\Column(type="string", length=32) */
+	#[ORM\Column(type: 'string', length: 32)]
 	private string $lastName;
 
-	/** @ORM\Column(type="string", length=32, nullable=true) */
+	#[ORM\Column(type: 'string', length: 32, nullable: true)]
 	private ?string $phone = null;
 
-	/** @ORM\Column(type="string", length=128, nullable=true) */
+	#[ORM\Column(type: 'string', length: 128, nullable: true)]
 	private ?string $password = null;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $newsletter = false;
 
-	/** @ORM\Column(type="text", nullable=true) */
+	#[ORM\Column(type: 'text', nullable: true)]
 	private ?string $companyName = null;
 
-	/** @ORM\Column(type="string", length=32, nullable=true) */
+	#[ORM\Column(type: 'string', length: 32, nullable: true)]
 	private ?string $ic = null;
 
-	/** @ORM\Column(type="string", length=32, nullable=true) */
+	#[ORM\Column(type: 'string', length: 32, nullable: true)]
 	private ?string $dic = null;
 
-	/** @ORM\Column(type="string", length=128, nullable=true) */
+	#[ORM\Column(type: 'string', length: 128, nullable: true)]
 	private ?string $street = null;
 
-	/** @ORM\Column(type="string", length=64, nullable=true) */
+	#[ORM\Column(type: 'string', length: 64, nullable: true)]
 	private ?string $city = null;
 
-	/** @ORM\Column(type="integer", nullable=true) */
+	#[ORM\Column(type: 'integer', nullable: true)]
 	private ?int $zip = null;
 
-	/** @ORM\Column(type="text", nullable=true) */
+	#[ORM\Column(type: 'text', nullable: true)]
 	private ?string $note = null;
 
-	/** @ORM\Column(type="boolean") */
+	#[ORM\Column(type: 'boolean')]
 	private bool $premium = false;
 
 	/**
@@ -66,14 +66,14 @@ class Customer
 	 * When creating a new order, the price of the entire order is automatically calculated,
 	 * from which this percentage discount is deducted and set as a fixed price per amount.
 	 * If the order is further edited, the discount will no longer change and the administrator must edit it manually.
-	 * @ORM\Column(type="float")
 	 */
+	#[ORM\Column(type: 'float')]
 	private float $defaultOrderSale = 0;
 
-	/** @ORM\Column(type="integer", nullable=true) */
+	#[ORM\Column(type: 'integer', nullable: true)]
 	private ?int $deprecatedId = null;
 
-	/** @ORM\Column(type="datetime") */
+	#[ORM\Column(type: 'datetime')]
 	private \DateTimeInterface $insertedDate;
 
 
