@@ -104,7 +104,7 @@ class Customer
 
 	public function setEmail(string $email): void
 	{
-		$email = (string)mb_strtolower($email, 'UTF-8');
+		$email = (string) mb_strtolower($email, 'UTF-8');
 		if (Validators::isEmail($email) === false) {
 			throw new \InvalidArgumentException(
 				'Customer e-mail is not valid, because value "' . $email . '" given.',

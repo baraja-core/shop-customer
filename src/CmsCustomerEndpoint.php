@@ -45,15 +45,6 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	public function actionDetail(int $id): void
 	{
 		$customer = $this->getCustomer($id);
-		$orders = [];
-		foreach ($customer->getOrders() as $order) {
-			$orders[] = [
-				'id' => $order->getId(),
-				'number' => $order->getNumber(),
-				'price' => $order->getPrice(),
-				'date' => $order->getInsertedDate(),
-			];
-		}
 
 		$this->sendJson(
 			[
@@ -65,7 +56,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 				'newsletter' => $customer->isNewsletter(),
 				'insertedDate' => $customer->getInsertedDate(),
 				'defaultOrderSale' => $customer->getDefaultOrderSale(),
-				'orders' => $orders,
+				'orders' => [], // TODO: Implement me by injecting OrderManager interface.
 			]
 		);
 	}
