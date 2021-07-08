@@ -79,7 +79,8 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		}
 
 		$customer = new Customer($email, $firstName, $lastName);
-		$this->entityManager->persist($customer)->flush();
+		$this->entityManager->persist($customer);
+		$this->entityManager->flush();
 		$this->flashMessage('Customer has been created.', 'success');
 		$this->sendOk();
 	}
