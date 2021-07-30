@@ -1,0 +1,2 @@
+extensions:
+	shopCustomer: Baraja\Shop\Customer\ShopCustomerExtension
