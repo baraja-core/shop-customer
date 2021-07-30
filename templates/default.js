@@ -2,10 +2,10 @@ Vue.component('cms-customer-default', {
 	template: `<div class="container-fluid">
 	<div class="row mt-2">
 		<div class="col">
-			<h1>Zákazníci</h1>
+			<h1>Customers</h1>
 		</div>
 		<div class="col-sm-3 text-right">
-			<b-button variant="success" v-b-modal.modal-create-customer>Nový zákazník</b-button>
+			<b-button variant="success" v-b-modal.modal-create-customer>New customer</b-button>
 		</div>
 	</div>
 	<div v-if="items === null" class="text-center py-5">
@@ -16,7 +16,7 @@ Vue.component('cms-customer-default', {
 			<b-form inline class="w-100">
 				<div class="w-100">
 					<div class="d-flex flex-column flex-sm-row align-items-sm-center pr-lg-0">
-						<b-form-input size="sm" v-model="filter.query" @input="sync" class="mr-3 w-100" style="max-width:400px" placeholder="Prohledejte uživatele..."></b-form-input>
+						<b-form-input size="sm" v-model="filter.query" @input="sync" class="mr-3 w-100" style="max-width:400px" placeholder="Search anywhere..."></b-form-input>
 					</div>
 				</div>
 			</b-form>
@@ -25,12 +25,12 @@ Vue.component('cms-customer-default', {
 			<table class="table table-sm">
 				<tr>
 					<th>ID</th>
-					<th>Jméno</th>
+					<th>Name</th>
 					<th>E-mail</th>
-					<th>Telefon</th>
+					<th>Phone</th>
 				</tr>
 				<tr v-for="item in items">
-					<td>{{ item.id }}</td>
+					<td><a :href="link('Customer:detail', {id: item.id})">{{ item.id }}</a></td>
 					<td>
 						<a :href="link('Customer:detail', {id: item.id})">{{ item.firstName }} {{ item.lastName }}</a>
 					</td>
@@ -46,14 +46,14 @@ Vue.component('cms-customer-default', {
 			<b-form-input v-model="createCustomerForm.email"></b-form-input>
 		</div>
 		<div class="mb-3">
-			Jméno:
+			First name:
 			<b-form-input v-model="createCustomerForm.firstName"></b-form-input>
 		</div>
 		<div class="mb-3">
-			Příjmení:
+			Last name:
 			<b-form-input v-model="createCustomerForm.lastName"></b-form-input>
 		</div>
-		<b-button variant="primary" @click="createCustomer">Založit zákazníka</b-button>
+		<b-button variant="primary" @click="createCustomer">Create new customer</b-button>
 	</b-modal>
 </div>`,
 	data() {

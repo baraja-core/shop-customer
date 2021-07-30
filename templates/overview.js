@@ -8,11 +8,11 @@ Vue.component('cms-customer-overview', {
 		<b-form @submit="save">
 			<div class="row">
 				<div class="col-4">
-					Jméno:
+					First name:
 					<input v-model="customer.firstName" class="form-control">
 				</div>
 				<div class="col-4">
-					Příjmení:
+					Last name:
 					<input v-model="customer.lastName" class="form-control">
 				</div>
 				<div class="col-4">
@@ -22,35 +22,36 @@ Vue.component('cms-customer-overview', {
 			</div>
 			<div class="row mt-3">
 				<div class="col-4">
-					Telefon:
+					Phone:
 					<input v-model="customer.phone" class="form-control">
 				</div>
 				<div class="col-4">
-					Datum registrace:
+					Register date:
 					<input v-model="customer.insertedDate" class="form-control">
 				</div>
 				<div class="col-4">
 					Newsletter?<br>
-					{{ customer.newsletter ? 'ano' : 'ne' }}
+					{{ customer.newsletter ? 'yes' : 'no ' }}
 				</div>
 			</div>
 			<div class="row mt-3">
 				<div class="col-4">
-					Základní sleva na všechny objednávky (v&nbsp;%):
+					Base discount on all orders (in&nbsp;%):
 					<input v-model="customer.defaultOrderSale" class="form-control">
 				</div>
 			</div>
 			<div class="mt-3">
-				<b-button type="submit" variant="primary">Uložit</b-button>
+				<b-button type="submit" variant="primary">Save</b-button>
 			</div>
 		</b-form>
 		<div class="mt-3">
-			<h4>Objednávky</h4>
-			<table class="table table-sm">
+			<h4>Orders</h4>
+			<p v-if="customer.orders.length === 0" class="text-center my-5">There are no orders.</p>
+			<table v-else class="table table-sm">
 				<tr>
-					<th>Číslo</th>
-					<th>Cena</th>
-					<th>Datum</th>
+					<th>Number</th>
+					<th>Price</th>
+					<th>Date</th>
 				</tr>
 				<tr v-for="order in customer.orders">
 					<td>
