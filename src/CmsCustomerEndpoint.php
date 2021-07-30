@@ -15,6 +15,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 {
 	public function __construct(
 		private EntityManager $entityManager,
+		private ?OrderLoader $orderLoader = null,
 	) {
 	}
 
@@ -56,7 +57,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 				'newsletter' => $customer->isNewsletter(),
 				'insertedDate' => $customer->getInsertedDate(),
 				'defaultOrderSale' => $customer->getDefaultOrderSale(),
-				'orders' => [], // TODO: Implement me by injecting OrderManager interface.
+				'orders' => $this->orderLoader !== null ? $this->orderLoader->getOrders($customer->getId()) : [],
 			]
 		);
 	}

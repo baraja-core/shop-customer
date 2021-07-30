@@ -32,7 +32,6 @@ final class CustomerPlugin extends BasePlugin
 			$this->error();
 		}
 
-		$this->setTitle('Customer');
-		$this->setSubtitle($customer->getName());
+		$this->setTitle('(' . $customer->getId() . ') ' . $customer->getName());
 	}
 }
