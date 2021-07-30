@@ -57,7 +57,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 				'newsletter' => $customer->isNewsletter(),
 				'insertedDate' => $customer->getInsertedDate(),
 				'defaultOrderSale' => $customer->getDefaultOrderSale(),
-				'orders' => $this->orderLoader !== null ? $this->orderLoader->getOrders($customer->getId()) : [],
+				'orders' => $this->orderLoader !== null ? $this->orderLoader->getOrders($id) : [],
 			]
 		);
 	}
