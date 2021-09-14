@@ -15,6 +15,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 {
 	public function __construct(
 		private EntityManager $entityManager,
+		private CustomerManager $customerManager,
 		private ?OrderLoader $orderLoader = null,
 	) {
 	}
@@ -31,8 +32,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		if ($query !== null) {
 			$selector->andWhere(
 				'customer.firstName LIKE :query OR customer.lastName LIKE :query OR customer.email LIKE :query OR customer.phone LIKE :query'
-			)
-				->setParameter('query', '%' . $query . '%');
+			)->setParameter('query', '%' . $query . '%');
 		}
 
 		$this->sendJson(
@@ -45,8 +45,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 
 	public function actionDetail(int $id): void
 	{
-		$customer = $this->getCustomer($id);
-
+		$customer = $this->customerManager->getById($id);
 		$this->sendJson(
 			[
 				'id' => $customer->getId(),
@@ -66,22 +65,10 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	public function postCreateCustomer(string $email, string $firstName, string $lastName): void
 	{
 		try {
-			$this->entityManager->getRepository(Customer::class)
-				->createQueryBuilder('c')
-				->where('c.email = :email')
-				->setParameter('email', $email)
-				->setMaxResults(1)
-				->getQuery()
-				->getSingleResult();
-
-			$this->sendError('Customer "' . $email . '" already exist.');
-		} catch (NoResultException | NonUniqueResultException) {
-			// Silence is golden.
+			$this->customerManager->createCustomer($email, $firstName, $lastName);
+		} catch (\InvalidArgumentException $e) {
+			$this->sendError($e->getMessage());
 		}
-
-		$customer = new Customer($email, $firstName, $lastName);
-		$this->entityManager->persist($customer);
-		$this->entityManager->flush();
 		$this->flashMessage('Customer has been created.', 'success');
 		$this->sendOk();
 	}
@@ -96,7 +83,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		float $defaultOrderSale,
 	): void {
 		try {
-			$customer = $this->getCustomer($id);
+			$customer = $this->customerManager->getById($id);
 		} catch (NoResultException | NonUniqueResultException) {
 			$this->sendError('Customer "' . $id . '" does not exist.');
 		}
@@ -112,17 +99,16 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	}
 
 
-	/**
-	 * @throws NoResultException|NonUniqueResultException
-	 */
-	private function getCustomer(int $id): Customer
+	public function postSavePassword(int $id, string $password): void
 	{
-		return $this->entityManager->getRepository(Customer::class)
-			->createQueryBuilder('c')
-			->where('c.id = :id')
-			->setParameter('id', $id)
-			->setMaxResults(1)
-			->getQuery()
-			->getSingleResult();
+		try {
+			$customer = $this->customerManager->getById($id);
+		} catch (NoResultException | NonUniqueResultException) {
+			$this->sendError('Customer "' . $id . '" does not exist.');
+		}
+		$customer->setPassword($password);
+		$this->entityManager->flush();
+		$this->flashMessage('Customer password has been changed.', 'success');
+		$this->sendOk();
 	}
 }

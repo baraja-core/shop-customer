@@ -7,6 +7,7 @@ namespace Baraja\Shop\Customer;
 
 use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\BasePlugin;
+use Baraja\Plugin\SimpleComponent\Button;
 use Baraja\Shop\Customer\Entity\Customer;
 
 final class CustomerPlugin extends BasePlugin
@@ -33,5 +34,13 @@ final class CustomerPlugin extends BasePlugin
 		}
 
 		$this->setTitle('(' . $customer->getId() . ') ' . $customer->getName());
+		$this->addButton(
+			new Button(
+				variant: Button::VARIANT_SECONDARY,
+				label: 'Change password',
+				action: Button::ACTION_MODAL,
+				target: 'modal-change-password',
+			)
+		);
 	}
 }

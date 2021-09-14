@@ -1,6 +1,6 @@
 Vue.component('cms-customer-overview', {
 	props: ['id'],
-	template: `<b-card>
+	template: `<cms-card>
 	<div v-if="customer === null" class="text-center py-5">
 		<b-spinner></b-spinner>
 	</div>
@@ -45,9 +45,9 @@ Vue.component('cms-customer-overview', {
 			</div>
 		</b-form>
 		<div class="mt-3">
-			<h4>Orders</h4>
+			<h4>Past orders</h4>
 			<p v-if="customer.orders.length === 0" class="text-center my-5">There are no orders.</p>
-			<table v-else class="table table-sm">
+			<table v-else class="table table-sm cms-table-no-border-top">
 				<tr>
 					<th>Number</th>
 					<th>Price</th>
@@ -63,10 +63,30 @@ Vue.component('cms-customer-overview', {
 			</table>
 		</div>
 	</template>
-</b-card>`,
+	<b-modal id="modal-change-password" title="Change customer password" hide-footer>
+		<p>
+			This form will permanently change the customer password.
+			The password change is permanent and cannot be undone.
+		</p>
+		<b-form @submit="changePassword">
+			<div class="mb-3">
+				New password:
+				<b-form-input type="password" v-model="form.password"></b-form-input>
+			</div>
+			<b-button type="submit" variant="danger">
+				<template v-if="form.loading"><b-spinner small></b-spinner></template>
+				<template v-else>Change password</template>
+			</b-button>
+		</b-form>
+	</b-modal>
+</cms-card>`,
 	data() {
 		return {
-			customer: null
+			customer: null,
+			form: {
+				loading: false,
+				password: ''
+			}
 		}
 	},
 	created() {
@@ -89,6 +109,21 @@ Vue.component('cms-customer-overview', {
 				phone: this.customer.phone,
 				defaultOrderSale: this.customer.defaultOrderSale
 			}).then(req => {
+				this.sync();
+			});
+		},
+		changePassword(evt) {
+			evt.preventDefault();
+			if (!confirm('Really?')) {
+				return;
+			}
+			this.form.loading = true;
+			axiosApi.post('cms-customer/save-password', {
+				id: this.id,
+				password: this.form.password
+			}).then(req => {
+				this.form.loading = false;
+				this.form.password = '';
 				this.sync();
 			});
 		}
