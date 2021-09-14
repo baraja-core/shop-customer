@@ -22,36 +22,42 @@ Vue.component('cms-customer-default', {
 			</b-form>
 		</cms-filter>
 		<b-card>
-			<table class="table table-sm">
+			<table class="table table-hover table-sm cms-table-no-border-top">
 				<tr>
 					<th>ID</th>
 					<th>Name</th>
 					<th>E-mail</th>
-					<th>Phone</th>
+					<th class="text-right">Phone</th>
+					<th class="text-right">Inserted</th>
 				</tr>
 				<tr v-for="item in items">
 					<td><a :href="link('Customer:detail', {id: item.id})">{{ item.id }}</a></td>
 					<td>
+						<span v-if="item.premium" v-b-tooltip title="Premium customer.">🌟</span>
+						<span v-if="item.ban" v-b-tooltip title="Customer is banned.">🚫</span>
 						<a :href="link('Customer:detail', {id: item.id})">{{ item.firstName }} {{ item.lastName }}</a>
 					</td>
 					<td>{{ item.email }}</td>
-					<td>{{ item.phone }}</td>
+					<td class="text-right">{{ item.phone }}</td>
+					<td class="text-right">{{ item.insertedDate }}</td>
 				</tr>
 			</table>
 		</b-card>
 	</template>
-	<b-modal id="modal-create-customer" title="Nový zákazník" hide-footer>
+	<b-modal id="modal-create-customer" title="Create a new customer" hide-footer>
+		<div class="row">
+			<div class="col mb-3">
+				First name:
+				<b-form-input v-model="createCustomerForm.firstName"></b-form-input>
+			</div>
+			<div class="col mb-3">
+				Last name:
+				<b-form-input v-model="createCustomerForm.lastName"></b-form-input>
+			</div>
+		</div>
 		<div class="mb-3">
 			E-mail:
 			<b-form-input v-model="createCustomerForm.email"></b-form-input>
-		</div>
-		<div class="mb-3">
-			First name:
-			<b-form-input v-model="createCustomerForm.firstName"></b-form-input>
-		</div>
-		<div class="mb-3">
-			Last name:
-			<b-form-input v-model="createCustomerForm.lastName"></b-form-input>
 		</div>
 		<b-button variant="primary" @click="createCustomer">Create new customer</b-button>
 	</b-modal>

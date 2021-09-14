@@ -25,16 +25,32 @@ Vue.component('cms-customer-overview', {
 					Phone:
 					<input v-model="customer.phone" class="form-control">
 				</div>
-				<div class="col-4">
+				<div class="col-2">
 					Register date:
 					<input v-model="customer.insertedDate" class="form-control">
 				</div>
-				<div class="col-4">
+				<div class="col-2">
+					<span v-b-tooltip title="Preferred user interface language.">Locale</span>
+					<b-form-select v-model="customer.locale" :options="locales"></b-form-select>
+				</div>
+				<div class="col-1">
+					Premium?<br>
+					<b-form-checkbox v-model="customer.premium"></b-form-checkbox>
+				</div>
+				<div class="col-1">
+					Ban?<br>
+					<b-form-checkbox v-model="customer.ban"></b-form-checkbox>
+				</div>
+				<div class="col-2">
 					Newsletter?<br>
 					{{ customer.newsletter ? 'yes' : 'no ' }}
 				</div>
 			</div>
 			<div class="row mt-3">
+				<div class="col-4">
+					Note:
+					<b-form-textarea v-model="customer.note" :class="{ 'bg-warning': customer.note }"></b-form-textarea>
+				</div>
 				<div class="col-4">
 					Base discount on all orders (in&nbsp;%):
 					<input v-model="customer.defaultOrderSale" class="form-control">
@@ -83,6 +99,7 @@ Vue.component('cms-customer-overview', {
 	data() {
 		return {
 			customer: null,
+			locales: [],
 			form: {
 				loading: false,
 				password: ''
@@ -96,7 +113,8 @@ Vue.component('cms-customer-overview', {
 		sync: function () {
 			axiosApi.get(`cms-customer/detail?id=${this.id}`)
 				.then(req => {
-					this.customer = req.data;
+					this.customer = req.data.customer;
+					this.locales = req.data.locales;
 				});
 		},
 		save(evt) {
@@ -107,6 +125,10 @@ Vue.component('cms-customer-overview', {
 				firstName: this.customer.firstName,
 				lastName: this.customer.lastName,
 				phone: this.customer.phone,
+				locale: this.customer.locale,
+				note: this.customer.note,
+				premium: this.customer.premium,
+				ban: this.customer.ban,
 				defaultOrderSale: this.customer.defaultOrderSale
 			}).then(req => {
 				this.sync();

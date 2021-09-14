@@ -65,6 +65,9 @@ class Customer
 	#[ORM\Column(type: 'boolean')]
 	private bool $premium = false;
 
+	#[ORM\Column(type: 'boolean')]
+	private bool $ban = false;
+
 	/**
 	 * Total discount as a percentage for each new order.
 	 * When creating a new order, the price of the entire order is automatically calculated,
@@ -322,6 +325,18 @@ class Customer
 	public function setPremium(bool $premium): void
 	{
 		$this->premium = $premium;
+	}
+
+
+	public function isBan(): bool
+	{
+		return $this->ban;
+	}
+
+
+	public function setBan(bool $ban): void
+	{
+		$this->ban = $ban;
 	}
 
 

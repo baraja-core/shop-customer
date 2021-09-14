@@ -6,6 +6,7 @@ namespace Baraja\Shop\Customer;
 
 
 use Baraja\Doctrine\EntityManager;
+use Baraja\Localization\Localization;
 use Baraja\Shop\Customer\Entity\Customer;
 use Baraja\StructuredApi\BaseEndpoint;
 use Doctrine\ORM\NonUniqueResultException;
@@ -16,6 +17,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	public function __construct(
 		private EntityManager $entityManager,
 		private CustomerManager $customerManager,
+		private Localization $localization,
 		private ?OrderLoader $orderLoader = null,
 	) {
 	}
@@ -25,8 +27,9 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	{
 		$selector = $this->entityManager->getRepository(Customer::class)
 			->createQueryBuilder('customer')
-			->select('PARTIAL customer.{id, firstName, lastName, email, phone}')
-			->orderBy('customer.insertedDate', 'DESC')
+			->select('PARTIAL customer.{id, firstName, lastName, email, phone, premium, ban, insertedDate}')
+			->orderBy('customer.premium', 'DESC')
+			->addOrderBy('customer.insertedDate', 'DESC')
 			->setMaxResults(128);
 
 		if ($query !== null) {
@@ -48,15 +51,27 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		$customer = $this->customerManager->getById($id);
 		$this->sendJson(
 			[
-				'id' => $customer->getId(),
-				'email' => $customer->getEmail(),
-				'firstName' => $customer->getFirstName(),
-				'lastName' => $customer->getLastName(),
-				'phone' => $customer->getPhone(),
-				'newsletter' => $customer->isNewsletter(),
-				'insertedDate' => $customer->getInsertedDate(),
-				'defaultOrderSale' => $customer->getDefaultOrderSale(),
-				'orders' => $this->orderLoader !== null ? $this->orderLoader->getOrders($id) : [],
+				'customer' => [
+					'id' => $customer->getId(),
+					'email' => $customer->getEmail(),
+					'firstName' => $customer->getFirstName(),
+					'lastName' => $customer->getLastName(),
+					'phone' => $customer->getPhone(),
+					'newsletter' => $customer->isNewsletter(),
+					'locale' => $customer->getLocale(),
+					'note' => $customer->getNote(),
+					'premium' => $customer->isPremium(),
+					'ban' => $customer->isBan(),
+					'insertedDate' => $customer->getInsertedDate(),
+					'defaultOrderSale' => $customer->getDefaultOrderSale(),
+					'orders' => $this->orderLoader !== null ? $this->orderLoader->getOrders($id) : [],
+				],
+				'locales' => $this->formatBootstrapSelectArray(
+					[null => '--'] + array_combine(
+						$this->localization->getAvailableLocales(),
+						$this->localization->getAvailableLocales()
+					)
+				),
 			]
 		);
 	}
@@ -80,6 +95,10 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		string $firstName,
 		string $lastName,
 		string $phone,
+		?string $locale,
+		?string $note,
+		bool $premium,
+		bool $ban,
 		float $defaultOrderSale,
 	): void {
 		try {
@@ -91,6 +110,10 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		$customer->setFirstName($firstName);
 		$customer->setLastName($lastName);
 		$customer->setPhone($phone);
+		$customer->setLocale($locale);
+		$customer->setNote($note);
+		$customer->setPremium($premium);
+		$customer->setBan($ban);
 		$customer->setDefaultOrderSale($defaultOrderSale);
 
 		$this->entityManager->flush();
