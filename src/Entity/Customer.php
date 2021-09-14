@@ -6,6 +6,7 @@ namespace Baraja\Shop\Customer\Entity;
 
 
 use Baraja\Doctrine\Identifier\IdentifierUnsigned;
+use Baraja\Localization\Localization;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Security\Passwords;
@@ -57,6 +58,9 @@ class Customer
 
 	#[ORM\Column(type: 'text', nullable: true)]
 	private ?string $note = null;
+
+	#[ORM\Column(type: 'string', length: 2, nullable: true)]
+	private ?string $locale = null;
 
 	#[ORM\Column(type: 'boolean')]
 	private bool $premium = false;
@@ -285,6 +289,21 @@ class Customer
 	public function setNote(?string $note): void
 	{
 		$this->note = trim($note ?? '') ?: null;
+	}
+
+
+	public function getLocale(): ?string
+	{
+		return $this->locale;
+	}
+
+
+	public function setLocale(?string $locale): void
+	{
+		if ($locale !== null) {
+			$locale = Localization::normalize($locale);
+		}
+		$this->locale = $locale;
 	}
 
 

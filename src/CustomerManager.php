@@ -6,6 +6,7 @@ namespace Baraja\Shop\Customer;
 
 
 use Baraja\Doctrine\EntityManager;
+use Baraja\Localization\Localization;
 use Baraja\Shop\Customer\Entity\Customer;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -14,6 +15,7 @@ final class CustomerManager
 {
 	public function __construct(
 		private EntityManager $entityManager,
+		private Localization $localization,
 	) {
 	}
 
@@ -28,6 +30,11 @@ final class CustomerManager
 		}
 
 		$customer = new Customer($email, $firstName, $lastName);
+		if (PHP_SAPI === 'cli') {
+			$customer->setLocale($this->localization->getDefaultLocale());
+		} else {
+			$customer->setLocale($this->localization->getLocale());
+		}
 		$this->entityManager->persist($customer);
 		$this->entityManager->flush();
 
