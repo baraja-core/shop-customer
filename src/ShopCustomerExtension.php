@@ -13,6 +13,15 @@ use Nette\DI\Definitions\ServiceDefinition;
 
 final class ShopCustomerExtension extends CompilerExtension
 {
+	/**
+	 * @return string[]
+	 */
+	public static function mustBeDefinedBefore(): array
+	{
+		return [PluginComponentExtension::class];
+	}
+
+
 	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
