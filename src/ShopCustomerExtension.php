@@ -7,6 +7,7 @@ namespace Baraja\Shop\Customer;
 
 use Baraja\Doctrine\ORM\DI\OrmAnnotationsExtension;
 use Baraja\Plugin\Component\VueComponent;
+use Baraja\Plugin\PluginComponentExtension;
 use Baraja\Plugin\PluginManager;
 use Nette\DI\CompilerExtension;
 use Nette\DI\Definitions\ServiceDefinition;
