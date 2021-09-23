@@ -87,8 +87,7 @@ class Customer
 	public function __construct(string $email, string $firstName, string $lastName, ?string $password = null)
 	{
 		$this->setEmail($email);
-		$this->setFirstName($firstName);
-		$this->setLastName($lastName);
+		$this->setName($firstName, $lastName);
 		$password = $password ?: null;
 		if ($password !== null) {
 			$this->setPassword($password);
@@ -129,6 +128,9 @@ class Customer
 
 	public function setFirstName(string $firstName): void
 	{
+		if (trim($firstName) === '') {
+			throw new \InvalidArgumentException('First name can not be empty.');
+		}
 		$this->firstName = $this->formatName($firstName);
 	}
 
@@ -141,6 +143,9 @@ class Customer
 
 	public function setLastName(string $lastName): void
 	{
+		if (trim($lastName) === '') {
+			throw new \InvalidArgumentException('Last name can not be empty.');
+		}
 		$this->lastName = $this->formatName($lastName);
 	}
 
@@ -361,6 +366,21 @@ class Customer
 	public function setDefaultOrderSale(float $defaultOrderSale): void
 	{
 		$this->defaultOrderSale = $defaultOrderSale;
+	}
+
+
+	/**
+	 * Set real user name by first name and last name.
+	 * Name can be entered duplicated from wrong source.
+	 */
+	private function setName(string $firstName, string $lastName): void
+	{
+		$parts = explode(' ', trim((string) preg_replace('/\s+/', ' ', $firstName)));
+		if ($firstName === $lastName && isset($parts[0], $parts[1])) {
+			[$firstName, $lastName] = $parts;
+		}
+		$this->setFirstName($firstName);
+		$this->setLastName($lastName);
 	}
 
 
