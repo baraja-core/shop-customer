@@ -26,6 +26,7 @@ final class ShopCustomerExtension extends CompilerExtension
 	public function beforeCompile(): void
 	{
 		$builder = $this->getContainerBuilder();
+		PluginComponentExtension::defineBasicServices($builder);
 		OrmAnnotationsExtension::addAnnotationPathToManager($builder, 'Baraja\Shop\Customer\Entity', __DIR__ . '/Entity');
 
 		$builder->addDefinition($this->prefix('customerManager'))
