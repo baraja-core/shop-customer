@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baraja\Shop\Customer\Entity;
 
 
+use Baraja\EcommerceStandard\DTO\CustomerInterface;
 use Baraja\Localization\Localization;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,7 +15,7 @@ use Nette\Utils\Validators;
 
 #[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ORM\Table(name: 'shop__customer')]
-class Customer
+class Customer implements CustomerInterface
 {
 	#[ORM\Id]
 	#[ORM\Column(type: 'integer', unique: true, options: ['unsigned' => true])]
@@ -122,6 +123,12 @@ class Customer
 			throw new \InvalidArgumentException(sprintf('Customer e-mail is not valid, because value "%s" given.', $email));
 		}
 		$this->email = $email;
+	}
+
+
+	public function getEmailOrPhone(): string
+	{
+		return $this->getPhone() ?? $this->getEmail();
 	}
 
 
