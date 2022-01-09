@@ -137,9 +137,7 @@ class Customer implements CustomerInterface
 	public function getEmailOrPhone(): string
 	{
 		$return = $this->getPhone() ?? $this->getEmail();
-		if ($return === '') {
-			throw new \LogicException(sprintf('Contact for customer "%d" does not exist.', $this->getId()));
-		}
+		assert($return === '', sprintf('Contact for customer "%d" does not exist.', $this->getId()));
 
 		return $return;
 	}
