@@ -5,42 +5,36 @@ declare(strict_types=1);
 namespace Baraja\Shop\Customer;
 
 
-use Baraja\Doctrine\EntityManager;
 use Baraja\Localization\Localization;
 use Baraja\Shop\Customer\Entity\Customer;
+use Baraja\Shop\Customer\Entity\CustomerRepository;
 use Baraja\StructuredApi\BaseEndpoint;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 
 final class CmsCustomerEndpoint extends BaseEndpoint
 {
+	private CustomerRepository $customerRepository;
+
+
 	public function __construct(
-		private EntityManager $entityManager,
+		private EntityManagerInterface $entityManager,
 		private CustomerManager $customerManager,
 		private Localization $localization,
 		private ?OrderLoader $orderLoader = null,
 	) {
+		$customerRepository = $entityManager->getRepository(Customer::class);
+		assert($customerRepository instanceof CustomerRepository);
+		$this->customerRepository = $customerRepository;
 	}
 
 
 	public function actionDefault(?string $query = null): void
 	{
-		$selector = $this->entityManager->getRepository(Customer::class)
-			->createQueryBuilder('customer')
-			->select('PARTIAL customer.{id, firstName, lastName, email, phone, premium, ban, insertedDate}')
-			->orderBy('customer.premium', 'DESC')
-			->addOrderBy('customer.insertedDate', 'DESC')
-			->setMaxResults(128);
-
-		if ($query !== null) {
-			$selector->andWhere(
-				'customer.firstName LIKE :query OR customer.lastName LIKE :query OR customer.email LIKE :query OR customer.phone LIKE :query'
-			)->setParameter('query', '%' . $query . '%');
-		}
-
 		$this->sendJson(
 			[
-				'items' => $selector->getQuery()->getArrayResult(),
+				'items' => $this->customerRepository->getFeed($query),
 			]
 		);
 	}
@@ -48,7 +42,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 
 	public function actionDetail(int $id): void
 	{
-		$customer = $this->customerManager->getById($id);
+		$customer = $this->customerRepository->getById($id);
 		$this->sendJson(
 			[
 				'customer' => [
@@ -102,9 +96,9 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		float $defaultOrderSale,
 	): void {
 		try {
-			$customer = $this->customerManager->getById($id);
+			$customer = $this->customerRepository->getById($id);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('Customer "' . $id . '" does not exist.');
+			$this->sendError(sprintf('Customer "%d" does not exist.', $id));
 		}
 		$customer->setEmail($email);
 		$customer->setFirstName($firstName);
@@ -125,9 +119,9 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	public function postSavePassword(int $id, string $password): void
 	{
 		try {
-			$customer = $this->customerManager->getById($id);
+			$customer = $this->customerRepository->getById($id);
 		} catch (NoResultException | NonUniqueResultException) {
-			$this->sendError('Customer "' . $id . '" does not exist.');
+			$this->sendError(sprintf('Customer "%d" does not exist.', $id));
 		}
 		$customer->setPassword($password);
 		$this->entityManager->flush();

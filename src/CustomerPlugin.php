@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Baraja\Shop\Customer;
 
 
-use Baraja\Doctrine\EntityManager;
 use Baraja\Plugin\BasePlugin;
 use Baraja\Plugin\SimpleComponent\Button;
 use Baraja\Shop\Customer\Entity\Customer;
+use Baraja\Shop\Customer\Entity\CustomerRepository;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class CustomerPlugin extends BasePlugin
 {
-	public function __construct(
-		private EntityManager $entityManager,
-	) {
+	private CustomerRepository $customerRepository;
+
+
+	public function __construct(EntityManagerInterface $entityManager,)
+	{
+		$customerRepository = $entityManager->getRepository(Customer::class);
+		assert($customerRepository instanceof CustomerRepository);
+		$this->customerRepository = $customerRepository;
 	}
 
 
@@ -26,21 +32,19 @@ final class CustomerPlugin extends BasePlugin
 
 	public function actionDetail(int $id): void
 	{
-		/** @var Customer|null $customer */
-		$customer = $this->entityManager->getRepository(Customer::class)->find($id);
-
+		$customer = $this->customerRepository->getById($id);
 		if ($customer === null) {
-			$this->error();
+			$this->error(sprintf('Customer %d does not exist.', $id));
 		}
 
-		$this->setTitle('(' . $customer->getId() . ') ' . $customer->getName());
+		$this->setTitle(sprintf('(%d) %s', $customer->getId(), $customer->getName()));
 		$this->addButton(
 			new Button(
 				variant: Button::VARIANT_SECONDARY,
 				label: 'Change password',
 				action: Button::ACTION_MODAL,
 				target: 'modal-change-password',
-			)
+			),
 		);
 	}
 }
