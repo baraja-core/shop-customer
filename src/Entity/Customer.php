@@ -12,7 +12,7 @@ use Nette\Security\Passwords;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CustomerRepository::class)]
 #[ORM\Table(name: 'shop__customer')]
 class Customer
 {
