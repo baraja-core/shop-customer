@@ -111,6 +111,9 @@ class Customer implements CustomerInterface
 	}
 
 
+	/**
+	 * @return non-empty-string
+	 */
 	public function getEmail(): string
 	{
 		if ($this->email === '') {
@@ -247,7 +250,7 @@ class Customer implements CustomerInterface
 
 	public function setCompanyName(?string $companyName): void
 	{
-		$companyName = Strings::firstUpper(trim($companyName ?? '')) ?: null;
+		$companyName = Strings::firstUpper(trim($companyName ?? ''));
 		$this->companyName = $companyName !== '' ? $companyName : null;
 	}
 
@@ -284,7 +287,7 @@ class Customer implements CustomerInterface
 
 	public function setStreet(?string $street): void
 	{
-		$street = Strings::firstUpper(trim($street ?? '')) ?: null;
+		$street = Strings::firstUpper(trim($street ?? ''));
 		$this->street = $street !== '' ? $street : null;
 	}
 
