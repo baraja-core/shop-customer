@@ -134,12 +134,12 @@ class Customer implements CustomerInterface
 	}
 
 
+	/**
+	 * @return non-empty-string
+	 */
 	public function getEmailOrPhone(): string
 	{
-		$return = $this->getPhone() ?? $this->getEmail();
-		assert($return === '', sprintf('Contact for customer "%d" does not exist.', $this->getId()));
-
-		return $return;
+		return $this->getPhone() ?? $this->getEmail();
 	}
 
 
