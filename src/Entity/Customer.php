@@ -9,7 +9,6 @@ use Baraja\Localization\Localization;
 use Baraja\PhoneNumber\PhoneNumberFormatter;
 use Doctrine\ORM\Mapping as ORM;
 use Nette\Security\Passwords;
-use Nette\Utils\DateTime;
 use Nette\Utils\Strings;
 use Nette\Utils\Validators;
 
@@ -82,8 +81,8 @@ class Customer
 	#[ORM\Column(type: 'integer', nullable: true)]
 	private ?int $deprecatedId = null;
 
-	#[ORM\Column(type: 'datetime')]
-	private \DateTimeInterface $insertedDate;
+	#[ORM\Column(type: 'datetime_immutable')]
+	private \DateTimeImmutable $insertedDate;
 
 
 	public function __construct(string $email, string $firstName, string $lastName, ?string $password = null)
@@ -94,7 +93,7 @@ class Customer
 		if ($password !== null) {
 			$this->setPassword($password);
 		}
-		$this->insertedDate = DateTime::from('now');
+		$this->insertedDate = new \DateTimeImmutable('now');
 	}
 
 
@@ -106,7 +105,7 @@ class Customer
 
 	public function getName(): string
 	{
-		return $this->getFirstName() . ' ' . $this->getLastName();
+		return trim(sprintf('%s %s', $this->getFirstName(), $this->getLastName()));
 	}
 
 
@@ -118,11 +117,9 @@ class Customer
 
 	public function setEmail(string $email): void
 	{
-		$email = (string) mb_strtolower($email, 'UTF-8');
+		$email = (string) mb_strtolower(trim($email), 'UTF-8');
 		if (Validators::isEmail($email) === false) {
-			throw new \InvalidArgumentException(
-				'Customer e-mail is not valid, because value "' . $email . '" given.',
-			);
+			throw new \InvalidArgumentException(sprintf('Customer e-mail is not valid, because value "%s" given.', $email));
 		}
 		$this->email = $email;
 	}
@@ -212,13 +209,13 @@ class Customer
 	}
 
 
-	public function setLegacyInsertedDate(\DateTimeInterface $date): void
+	public function setLegacyInsertedDate(\DateTimeImmutable $date): void
 	{
 		$this->insertedDate = $date;
 	}
 
 
-	public function getInsertedDate(): \DateTimeInterface
+	public function getInsertedDate(): \DateTimeImmutable
 	{
 		return $this->insertedDate;
 	}
@@ -404,7 +401,7 @@ class Customer
 			}
 			$name = trim($shortName);
 			if ($name === '') {
-				$name = Strings::substring($name, 0, $length);
+				$name = mb_substr($name, 0, $length, 'UTF-8');
 			}
 		}
 
