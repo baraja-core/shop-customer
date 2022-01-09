@@ -90,8 +90,7 @@ class Customer implements CustomerInterface
 	{
 		$this->setEmail($email);
 		$this->setName($firstName, $lastName);
-		$password = $password ?: null;
-		if ($password !== null) {
+		if ($password !== null && $password !== '') {
 			$this->setPassword($password);
 		}
 		$this->insertedDate = new \DateTimeImmutable('now');
@@ -100,6 +99,8 @@ class Customer implements CustomerInterface
 
 	public function getId(): int
 	{
+		assert($this->id >= 1);
+
 		return $this->id;
 	}
 
@@ -112,13 +113,17 @@ class Customer implements CustomerInterface
 
 	public function getEmail(): string
 	{
+		if ($this->email === '') {
+			throw new \LogicException(sprintf('Customer e-mail can not be empty string (id "%d").', $this->getId()));
+		}
+
 		return $this->email;
 	}
 
 
 	public function setEmail(string $email): void
 	{
-		$email = (string) mb_strtolower(trim($email), 'UTF-8');
+		$email = mb_strtolower(trim($email), 'UTF-8');
 		if (Validators::isEmail($email) === false) {
 			throw new \InvalidArgumentException(sprintf('Customer e-mail is not valid, because value "%s" given.', $email));
 		}
@@ -128,7 +133,12 @@ class Customer implements CustomerInterface
 
 	public function getEmailOrPhone(): string
 	{
-		return $this->getPhone() ?? $this->getEmail();
+		$return = $this->getPhone() ?? $this->getEmail();
+		if ($return === '') {
+			throw new \LogicException(sprintf('Contact for customer "%d" does not exist.', $this->getId()));
+		}
+
+		return $return;
 	}
 
 
@@ -164,13 +174,14 @@ class Customer implements CustomerInterface
 
 	public function getPhone(): ?string
 	{
-		return $this->phone;
+		return $this->phone !== '' ? $this->phone : null;
 	}
 
 
 	public function setPhone(?string $phone, int $region = 420): void
 	{
-		$this->phone = $phone ? PhoneNumberFormatter::fix($phone, $region) : null;
+		$phone = trim((string) $phone);
+		$this->phone = $phone !== '' ? PhoneNumberFormatter::fix($phone, $region) : null;
 	}
 
 
@@ -236,7 +247,8 @@ class Customer implements CustomerInterface
 
 	public function setCompanyName(?string $companyName): void
 	{
-		$this->companyName = Strings::firstUpper(trim($companyName ?? '')) ?: null;
+		$companyName = Strings::firstUpper(trim($companyName ?? '')) ?: null;
+		$this->companyName = $companyName !== '' ? $companyName : null;
 	}
 
 
@@ -248,7 +260,7 @@ class Customer implements CustomerInterface
 
 	public function setIc(?string $ic): void
 	{
-		$this->ic = $ic ?: null;
+		$this->ic = $ic !== '' ? $ic : null;
 	}
 
 
@@ -272,7 +284,8 @@ class Customer implements CustomerInterface
 
 	public function setStreet(?string $street): void
 	{
-		$this->street = Strings::firstUpper(trim($street ?? '')) ?: null;
+		$street = Strings::firstUpper(trim($street ?? '')) ?: null;
+		$this->street = $street !== '' ? $street : null;
 	}
 
 
@@ -284,7 +297,8 @@ class Customer implements CustomerInterface
 
 	public function setCity(?string $city): void
 	{
-		$this->city = Strings::firstUpper(trim($city ?? '')) ?: null;
+		$city = Strings::firstUpper(trim($city ?? ''));
+		$this->city = $city !== '' ? $city : null;
 	}
 
 
@@ -296,7 +310,10 @@ class Customer implements CustomerInterface
 
 	public function setZip(?int $zip): void
 	{
-		$this->zip = $zip ?: null;
+		if ($zip === 0) {
+			$zip = null;
+		}
+		$this->zip = $zip;
 	}
 
 
@@ -308,7 +325,8 @@ class Customer implements CustomerInterface
 
 	public function setNote(?string $note): void
 	{
-		$this->note = trim($note ?? '') ?: null;
+		$note = trim($note ?? '');
+		$this->note = $note !== '' ? $note : null;
 	}
 
 

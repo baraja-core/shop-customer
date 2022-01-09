@@ -10,6 +10,8 @@ use Baraja\Plugin\SimpleComponent\Button;
 use Baraja\Shop\Customer\Entity\Customer;
 use Baraja\Shop\Customer\Entity\CustomerRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 
 final class CustomerPlugin extends BasePlugin
 {
@@ -32,9 +34,10 @@ final class CustomerPlugin extends BasePlugin
 
 	public function actionDetail(int $id): void
 	{
-		$customer = $this->customerRepository->getById($id);
-		if ($customer === null) {
-			$this->error(sprintf('Customer %d does not exist.', $id));
+		try {
+			$customer = $this->customerRepository->getById($id);
+		} catch (NoResultException | NonUniqueResultException) {
+			$this->error(sprintf('Customer "%d" does not exist.', $id));
 		}
 
 		$this->setTitle(sprintf('(%d) %s', $customer->getId(), $customer->getName()));
