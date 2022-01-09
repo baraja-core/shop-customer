@@ -16,7 +16,7 @@ final class CustomerPlugin extends BasePlugin
 	private CustomerRepository $customerRepository;
 
 
-	public function __construct(EntityManagerInterface $entityManager,)
+	public function __construct(EntityManagerInterface $entityManager)
 	{
 		$customerRepository = $entityManager->getRepository(Customer::class);
 		assert($customerRepository instanceof CustomerRepository);

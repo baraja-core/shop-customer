@@ -35,7 +35,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		$this->sendJson(
 			[
 				'items' => $this->customerRepository->getFeed($query),
-			]
+			],
 		);
 	}
 
@@ -63,10 +63,10 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 				'locales' => $this->formatBootstrapSelectArray(
 					[null => '--'] + array_combine(
 						$this->localization->getAvailableLocales(),
-						$this->localization->getAvailableLocales()
-					)
+						$this->localization->getAvailableLocales(),
+					),
 				),
-			]
+			],
 		);
 	}
 
