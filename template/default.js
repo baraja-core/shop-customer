@@ -90,7 +90,7 @@ Vue.component('cms-customer-default', {
 				email: this.createCustomerForm.email,
 				firstName: this.createCustomerForm.firstName,
 				lastName: this.createCustomerForm.lastName
-			}).then(req => {
+			}).then(() => {
 				this.createCustomerForm = {
 					email: '',
 					firstName: '',

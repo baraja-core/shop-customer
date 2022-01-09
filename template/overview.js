@@ -130,7 +130,7 @@ Vue.component('cms-customer-overview', {
 				premium: this.customer.premium,
 				ban: this.customer.ban,
 				defaultOrderSale: this.customer.defaultOrderSale
-			}).then(req => {
+			}).then(() => {
 				this.sync();
 			});
 		},
@@ -143,7 +143,7 @@ Vue.component('cms-customer-overview', {
 			axiosApi.post('cms-customer/save-password', {
 				id: this.id,
 				password: this.form.password
-			}).then(req => {
+			}).then(() => {
 				this.form.loading = false;
 				this.form.password = '';
 				this.sync();
