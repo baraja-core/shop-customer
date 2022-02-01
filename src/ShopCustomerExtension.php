@@ -33,6 +33,10 @@ final class ShopCustomerExtension extends CompilerExtension
 			->setFactory(CustomerManager::class)
 			->setAutowired(CustomerManager::class);
 
+		$builder->addDefinition($this->prefix('customerResetPasswordManager'))
+			->setFactory(CustomerResetPasswordManager::class)
+			->setAutowired(CustomerResetPasswordManager::class);
+
 		/** @var ServiceDefinition $pluginManager */
 		$pluginManager = $this->getContainerBuilder()->getDefinitionByType(PluginManager::class);
 		$pluginManager->addSetup('?->addComponent(?)', ['@self', [
