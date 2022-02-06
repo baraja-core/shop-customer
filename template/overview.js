@@ -73,7 +73,7 @@ Vue.component('cms-customer-overview', {
 					<td>
 						<a :href="link('CmsOrder:detail', {id: order.id})">{{ order.number }}</a>
 					</td>
-					<td>{{ order.price }}&nbsp;Kč</td>
+					<td v-html="order.price"></td>
 					<td>{{ order.date }}</td>
 				</tr>
 			</table>
