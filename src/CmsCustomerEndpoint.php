@@ -88,7 +88,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		string $email,
 		string $firstName,
 		string $lastName,
-		string $phone,
+		?string $phone,
 		?string $locale,
 		?string $note,
 		bool $premium,
