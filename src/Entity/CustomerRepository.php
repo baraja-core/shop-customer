@@ -66,12 +66,16 @@ final class CustomerRepository extends EntityRepository
 			->setMaxResults($limit);
 
 		if ($query !== null) {
-			$selector->andWhere(implode(' OR ', [
-				'customer.firstName LIKE :query',
-				'customer.lastName LIKE :query',
-				'customer.email LIKE :query',
-				'customer.phone LIKE :query',
-			]))->setParameter('query', '%' . $query . '%');
+			$query = trim((string) preg_replace('/\s+/', ' ', $query));
+			foreach (explode(' ', $query) as $key => $queryPart) {
+				$param = sprintf('query_%s', $key);
+				$rules = array_map(
+					static fn (string $col): string => sprintf('customer.%s LIKE :%s', $col, $param),
+					['firstName', 'lastName', 'email', 'phone'],
+				);
+				$selector->andWhere(implode(' OR ', $rules));
+				$selector->setParameter($param, sprintf('%%%s%%', $queryPart));
+			}
 		}
 
 		/** @phpstan-ignore-next-line */
