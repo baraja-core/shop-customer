@@ -13,7 +13,7 @@ Vue.component('cms-customer-default', {
 	</div>
 	<template v-else>
 		<cms-filter>
-			<b-form inline class="w-100">
+			<b-form inline @submit.prevent class="w-100">
 				<div class="w-100">
 					<div class="d-flex flex-column flex-sm-row align-items-sm-center pr-lg-0">
 						<b-form-input size="sm" v-model="filter.query" @input="sync" class="mr-3 w-100" style="max-width:400px" placeholder="Search anywhere..."></b-form-input>
