@@ -151,10 +151,7 @@ class Customer implements CustomerInterface
 
 	public function setFirstName(string $firstName): void
 	{
-		if (trim($firstName) === '') {
-			throw new \InvalidArgumentException('First name can not be empty.');
-		}
-		$this->firstName = $this->formatName($firstName);
+		$this->setName($firstName, $this->lastName);
 	}
 
 
@@ -166,10 +163,7 @@ class Customer implements CustomerInterface
 
 	public function setLastName(string $lastName): void
 	{
-		if (trim($lastName) === '') {
-			throw new \InvalidArgumentException('Last name can not be empty.');
-		}
-		$this->lastName = $this->formatName($lastName);
+		$this->setName($this->firstName, $lastName);
 	}
 
 
@@ -410,8 +404,15 @@ class Customer implements CustomerInterface
 		if ($firstName === $lastName && isset($parts[0], $parts[1])) {
 			[$firstName, $lastName] = $parts;
 		}
-		$this->setFirstName($firstName);
-		$this->setLastName($lastName);
+		$validator = static function(string $name): void {
+			if (trim($name) === '') {
+				throw new \InvalidArgumentException('Name can not be empty.');
+			}
+		};
+		$validator($firstName);
+		$validator($lastName);
+		$this->firstName = $this->formatName($firstName);
+		$this->lastName = $this->formatName($lastName);
 	}
 
 
