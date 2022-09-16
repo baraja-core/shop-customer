@@ -14,7 +14,7 @@
 		"baraja-core/doctrine": "^3.0",
 		"baraja-core/phone-number": "^1.0",
 		"baraja-core/plugin-system": "^2.2",
-		"baraja-core/structured-api": "^3.0",
+		"baraja-core/structured-api": "^4.0",
 		"baraja-core/localization": "^2.0"
 	},
 	"require-dev": {
