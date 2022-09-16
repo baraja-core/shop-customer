@@ -70,7 +70,7 @@ final class CustomerRepository extends EntityRepository
 			foreach (explode(' ', $query) as $key => $queryPart) {
 				$param = sprintf('query_%s', $key);
 				$rules = array_map(
-					static fn (string $col): string => sprintf('customer.%s LIKE :%s', $col, $param),
+					static fn(string $col): string => sprintf('customer.%s LIKE :%s', $col, $param),
 					['firstName', 'lastName', 'email', 'phone'],
 				);
 				$selector->andWhere(implode(' OR ', $rules));
