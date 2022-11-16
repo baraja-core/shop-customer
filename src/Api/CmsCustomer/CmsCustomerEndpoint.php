@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Baraja\Shop\Customer;
+namespace Baraja\Shop\Customer\Api\CmsCustomer;
 
 
 use Baraja\Localization\Localization;
+use Baraja\Shop\Customer\CustomerManager;
 use Baraja\Shop\Customer\Entity\Customer;
 use Baraja\Shop\Customer\Entity\CustomerRepository;
+use Baraja\Shop\Customer\OrderLoader;
 use Baraja\StructuredApi\BaseEndpoint;
+use Baraja\StructuredApi\Response\Status\ErrorResponse;
+use Baraja\StructuredApi\Response\Status\OkResponse;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -30,56 +34,55 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 	}
 
 
-	public function actionDefault(?string $query = null): void
+	public function actionDefault(?string $query = null): CmsCustomerResponse
 	{
-		$this->sendJson(
-			[
-				'items' => $this->customerRepository->getFeed($query),
-			],
+		return new CmsCustomerResponse(
+			items: $this->customerRepository->getFeed($query),
 		);
 	}
 
 
-	public function actionDetail(int $id): void
+	public function actionDetail(int $id): CustomerDetailResponse
 	{
 		$customer = $this->customerRepository->getById($id);
-		$this->sendJson(
-			[
-				'customer' => [
-					'id' => $customer->getId(),
-					'email' => $customer->getEmail(),
-					'firstName' => $customer->getFirstName(),
-					'lastName' => $customer->getLastName(),
-					'phone' => $customer->getPhone(),
-					'newsletter' => $customer->isNewsletter(),
-					'locale' => $customer->getLocale(),
-					'note' => $customer->getNote(),
-					'premium' => $customer->isPremium(),
-					'ban' => $customer->isBan(),
-					'insertedDate' => $customer->getInsertedDate(),
-					'defaultOrderSale' => $customer->getDefaultOrderSale(),
-					'orders' => $this->orderLoader !== null ? $this->orderLoader->getOrders($id) : [],
-				],
-				'locales' => $this->formatBootstrapSelectArray(
-					[null => '--'] + array_combine(
-						$this->localization->getAvailableLocales(),
-						$this->localization->getAvailableLocales(),
-					),
+
+		$entity = new CustomerDetailEntityResponse;
+		$entity->id = $customer->getId();
+		$entity->email = $customer->getEmail();
+		$entity->firstName = $customer->getFirstName();
+		$entity->lastName = $customer->getLastName();
+		$entity->phone = $customer->getPhone();
+		$entity->newsletter = $customer->isNewsletter();
+		$entity->locale = $customer->getLocale();
+		$entity->note = $customer->getNote();
+		$entity->premium = $customer->isPremium();
+		$entity->ban = $customer->isBan();
+		$entity->insertedDate = $customer->getInsertedDate();
+		$entity->defaultOrderSale = $customer->getDefaultOrderSale();
+		$entity->orders = $this->orderLoader !== null ? $this->orderLoader->getOrders($id) : [];
+
+		return new CustomerDetailResponse(
+			customer: $entity,
+			locales: $this->formatBootstrapSelectArray(
+				[null => '--'] + array_combine(
+					$this->localization->getAvailableLocales(),
+					$this->localization->getAvailableLocales(),
 				),
-			],
+			),
 		);
 	}
 
 
-	public function postCreateCustomer(string $email, string $firstName, string $lastName): void
+	public function postCreateCustomer(string $email, string $firstName, string $lastName): OkResponse
 	{
 		try {
 			$this->customerManager->createCustomer($email, $firstName, $lastName);
 		} catch (\InvalidArgumentException $e) {
-			$this->sendError($e->getMessage());
+			ErrorResponse::invoke($e->getMessage());
 		}
 		$this->flashMessage('Customer has been created.', 'success');
-		$this->sendOk();
+
+		return new OkResponse;
 	}
 
 
@@ -94,7 +97,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		bool $premium,
 		bool $ban,
 		float $defaultOrderSale,
-	): void {
+	): OkResponse {
 		try {
 			$customer = $this->customerRepository->getById($id);
 		} catch (NoResultException | NonUniqueResultException) {
@@ -112,11 +115,12 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 
 		$this->entityManager->flush();
 		$this->flashMessage('Customer information has been saved.', 'success');
-		$this->sendOk();
+
+		return new OkResponse;
 	}
 
 
-	public function postSavePassword(int $id, string $password): void
+	public function postSavePassword(int $id, string $password): OkResponse
 	{
 		try {
 			$customer = $this->customerRepository->getById($id);
@@ -126,6 +130,7 @@ final class CmsCustomerEndpoint extends BaseEndpoint
 		$customer->setPassword($password);
 		$this->entityManager->flush();
 		$this->flashMessage('Customer password has been changed.', 'success');
-		$this->sendOk();
+
+		return new OkResponse;
 	}
 }
